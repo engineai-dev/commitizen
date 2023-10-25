@@ -52,10 +52,13 @@ Some examples of pep440:
 
 ```bash
 $ cz bump --help
-usage: cz bump [-h] [--dry-run] [--files-only] [--local-version] [--changelog] [--no-verify] [--yes] [--tag-format TAG_FORMAT]
-               [--bump-message BUMP_MESSAGE] [--prerelease {alpha,beta,rc}] [--devrelease DEVRELEASE] [--increment {MAJOR,MINOR,PATCH}]
-               [--check-consistency] [--annotated-tag] [--gpg-sign] [--changelog-to-stdout] [--git-output-to-stderr] [--retry] [--major-version-zero]
-               [--prerelease-offset PRERELEASE_OFFSET] [--version-scheme {pep440,semver,semver2}] [--version-type {pep440,semver,semver2}] [--build-metadata BUILD_METADATA]
+usage: cz bump [-h] [--dry-run] [--files-only] [--local-version] [--build-metadata BUILD_METADATA]
+               [--changelog] [--no-verify] [--yes] [--tag-format TAG_FORMAT]
+               [--bump-message BUMP_MESSAGE] [--prerelease {alpha,beta,rc}]
+               [--devrelease DEVRELEASE] [--increment {MAJOR,MINOR,PATCH}]
+               [--check-consistency] [--annotated-tag] [--gpg-sign]
+               [--changelog-to-stdout] [--git-output-to-stderr] [--retry] [--major-version-zero]
+               [--template TEMPLATE] [--extra EXTRA]
                [MANUAL_VERSION]
 
 positional arguments:
@@ -159,7 +162,7 @@ exact changes that have been specified with `--increment` or determined from the
 Below are some examples that illustrate the difference in behavior:
 
 | Increment | Pre-release | Start Version | `--increment-mode=linear` | `--increment-mode=exact` |
-|-----------|-------------|---------------|---------------------------|--------------------------|
+| --------- | ----------- | ------------- | ------------------------- | ------------------------ |
 | `MAJOR`   |             | `2.0.0b0`     | `2.0.0`                   | `3.0.0`                  |
 | `MINOR`   |             | `2.0.0b0`     | `2.0.0`                   | `2.1.0`                  |
 | `PATCH`   |             | `2.0.0b0`     | `2.0.0`                   | `2.0.1`                  |
@@ -478,8 +481,8 @@ This means that it will find a file `setup.py` and will only make a change
 in a line containing the `version` substring.
 
 !!! note
-    Files can be specified using relative (to the execution) paths, absolute paths
-    or glob patterns.
+Files can be specified using relative (to the execution) paths, absolute paths
+or glob patterns.
 
 ---
 
