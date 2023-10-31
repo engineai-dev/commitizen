@@ -152,7 +152,7 @@ class Bump:
 
         dry_run: bool = self.arguments["dry_run"]
         is_yes: bool = self.arguments["yes"]
-        increment: str | None = self.arguments["increment"]
+        increment: Increment | None = self.arguments["increment"]
         prerelease: str | None = self.arguments["prerelease"]
         postrelease: bool = self.arguments["postrelease"]
         devrelease: int | None = self.arguments["devrelease"]
