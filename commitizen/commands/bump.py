@@ -158,6 +158,7 @@ class Bump:
         is_local_version: bool | None = self.arguments["local_version"]
         build_metadata: str | None = self.arguments["build_metadata"]
         manual_version = self.arguments["manual_version"]
+        build_metadata = self.arguments["build_metadata"]
 
         if manual_version:
             if increment:
@@ -179,7 +180,7 @@ class Bump:
 
             if build_metadata:
                 raise NotAllowed(
-                    "--build_metadata cannot be combined with MANUAL_VERSION"
+                    "--build-metadata cannot be combined with MANUAL_VERSION"
                 )
 
             if major_version_zero:
@@ -196,6 +197,12 @@ class Bump:
             if not current_version.release[0] == 0:
                 raise NotAllowed(
                     f"--major-version-zero is meaningless for current version {current_version}"
+                )
+
+        if build_metadata:
+            if is_local_version:
+                raise NotAllowed(
+                    "--local-version cannot be combined with --build-metadata"
                 )
 
         current_tag_version: str = bump.normalize_tag(
