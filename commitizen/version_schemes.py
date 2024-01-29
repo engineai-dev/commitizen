@@ -105,6 +105,24 @@ class VersionProtocol(Protocol):
         """The third item of :attr:`release` or ``0`` if unavailable."""
         raise NotImplementedError("must be implemented")
 
+    def __lt__(self, other: Any) -> bool:
+        raise NotImplementedError("must be implemented")
+
+    def __le__(self, other: Any) -> bool:
+        raise NotImplementedError("must be implemented")
+
+    def __eq__(self, other: object) -> bool:
+        raise NotImplementedError("must be implemented")
+
+    def __ge__(self, other: Any) -> bool:
+        raise NotImplementedError("must be implemented")
+
+    def __gt__(self, other: Any) -> bool:
+        raise NotImplementedError("must be implemented")
+
+    def __ne__(self, other: object) -> bool:
+        raise NotImplementedError("must be implemented")
+
     def bump(
         self,
         increment: str,
