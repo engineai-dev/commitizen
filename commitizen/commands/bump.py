@@ -53,6 +53,7 @@ class Bump:
                     "prerelease",
                     "postrelease",
                     "increment",
+                    "exact_increment",
                     "bump_message",
                     "gpg_sign",
                     "annotated_tag",
@@ -160,6 +161,7 @@ class Bump:
         is_local_version: bool | None = self.arguments["local_version"]
         build_metadata: str | None = self.arguments["build-metadata"]
         manual_version = self.arguments["manual_version"]
+        exact_increment: bool = self.arguments["exact_increment"]
 
         if manual_version:
             if increment:
@@ -261,6 +263,7 @@ class Bump:
                 devrelease=devrelease,
                 is_local_version=is_local_version,
                 build_metadata=build_metadata,
+                exact_increment=exact_increment,
             )
 
         new_tag_version = bump.normalize_tag(
@@ -362,6 +365,7 @@ class Bump:
         if is_files_only:
             raise ExpectedExit()
 
+        # FIXME: check if any changes have been staged
         c = git.commit(message, args=self._get_commit_args())
         if self.retry and c.return_code != 0 and self.changelog:
             # Maybe pre-commit reformatted some files? Retry once
