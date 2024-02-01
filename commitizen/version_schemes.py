@@ -114,6 +114,7 @@ class VersionProtocol(Protocol):
         devrelease: int | None = None,
         is_local_version: bool = False,
         build_metadata: str | None = None,
+        force_bump: bool = False,
     ) -> Self:
         """
         Based on the given increment, generate the next bumped version according to the version scheme
@@ -167,6 +168,12 @@ class BaseVersion(_BaseVersion):
         if not prerelease:
             return ""
 
+        # prevent down-bumping the pre-release phase, e.g. from 'b1' to 'a2'
+        # https://packaging.python.org/en/latest/specifications/version-specifiers/#pre-releases
+        # https://semver.org/#spec-item-11
+        if self.is_prerelease and self.pre:
+            prerelease = max(prerelease, self.pre[0])
+
         # version.pre is needed for mypy check
         if self.is_prerelease and self.pre and prerelease.startswith(self.pre[0]):
             prev_prerelease: int = self.pre[1]
@@ -216,20 +223,15 @@ class BaseVersion(_BaseVersion):
         increments = [MAJOR, MINOR, PATCH]
         base = dict(zip_longest(increments, prev_release, fillvalue=0))
 
-        # This flag means that current version
-        # must remove its prerelease tag,
-        # so it doesn't matter the increment.
-        # Example: 1.0.0a0 with PATCH/MINOR -> 1.0.0
-        if not self.is_prerelease:
-            if increment == MAJOR:
-                base[MAJOR] += 1
-                base[MINOR] = 0
-                base[PATCH] = 0
-            elif increment == MINOR:
-                base[MINOR] += 1
-                base[PATCH] = 0
-            elif increment == PATCH:
-                base[PATCH] += 1
+        if increment == MAJOR:
+            base[MAJOR] += 1
+            base[MINOR] = 0
+            base[PATCH] = 0
+        elif increment == MINOR:
+            base[MINOR] += 1
+            base[PATCH] = 0
+        elif increment == PATCH:
+            base[PATCH] += 1
 
         return f"{base[MAJOR]}.{base[MINOR]}.{base[PATCH]}"
 
@@ -242,6 +244,7 @@ class BaseVersion(_BaseVersion):
         devrelease: int | None = None,
         is_local_version: bool = False,
         build_metadata: str | None = None,
+        force_bump: bool = False,
     ) -> Self:
         """Based on the given increment a proper semver will be generated.
 
@@ -259,7 +262,20 @@ class BaseVersion(_BaseVersion):
             local_version = self.scheme(self.local).bump(increment)
             return self.scheme(f"{self.public}+{local_version}")  # type: ignore
         else:
-            base = self.increment_base(increment)
+            if not self.is_prerelease:
+                base = self.increment_base(increment)
+            elif force_bump:
+                base = self.increment_base(increment)
+            else:
+                base = f"{self.major}.{self.minor}.{self.micro}"
+                if increment == PATCH:
+                    pass
+                elif increment == MINOR:
+                    if self.micro != 0:
+                        base = self.increment_base(increment)
+                elif increment == MAJOR:
+                    if self.minor != 0 or self.micro != 0:
+                        base = self.increment_base(increment)
             dev_version = self.generate_devrelease(devrelease)
             pre_version = self.generate_prerelease(prerelease, offset=prerelease_offset)
             post_version = self.generate_postrelease(postrelease)
