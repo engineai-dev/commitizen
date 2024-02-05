@@ -26,7 +26,9 @@ from commitizen.changelog_formats import get_changelog_format
 from commitizen.providers import get_provider
 from commitizen.version_schemes import (
     get_version_scheme,
+    Increment,
     InvalidVersion,
+    Prerelease,
 )
 
 logger = getLogger("commitizen")
@@ -113,7 +115,7 @@ class Bump:
                 is_initial = questionary.confirm("Is this the first tag created?").ask()
         return is_initial
 
-    def find_increment(self, commits: list[git.GitCommit]) -> str | None:
+    def find_increment(self, commits: list[git.GitCommit]) -> Increment | None:
         # Update the bump map to ensure major version doesn't increment.
         is_major_version_zero: bool = self.bump_settings["major_version_zero"]
         # self.cz.bump_map = defaults.bump_map_major_version_zero
@@ -133,7 +135,7 @@ class Bump:
         )
         return increment
 
-    def __call__(self):  # noqa: C901
+    def __call__(self) -> None:  # noqa: C901
         """Steps executed to bump."""
         provider = get_provider(self.config)
 
@@ -156,9 +158,8 @@ class Bump:
         devrelease: int | None = self.arguments["devrelease"]
         is_files_only: bool | None = self.arguments["files_only"]
         is_local_version: bool | None = self.arguments["local_version"]
-        build_metadata: str | None = self.arguments["build_metadata"]
+        build_metadata: str | None = self.arguments["build-metadata"]
         manual_version = self.arguments["manual_version"]
-        build_metadata = self.arguments["build_metadata"]
 
         if manual_version:
             if increment:
@@ -416,7 +417,7 @@ class Bump:
         else:
             out.success("Done!")
 
-    def _get_commit_args(self):
+    def _get_commit_args(self) -> str:
         commit_args = ["-a"]
         if self.no_verify:
             commit_args.append("--no-verify")
