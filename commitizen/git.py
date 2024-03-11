@@ -173,7 +173,9 @@ def get_tags(prefix: str, dateformat: str = "%Y-%m-%d", reachable_only: bool = F
         f'%(object)"'
     )
     extra = "--merged" if reachable_only else ""
-    c = cmd.run(f"git tag --format={formatter} --sort=-creatordate {extra}")
+    # Force the default language for parsing
+    env = {"LC_ALL": "C", "LANG": "C", "LANGUAGE": "C"}
+    c = cmd.run(f"git tag --format={formatter} --sort=-creatordate {extra}", env=env)
     if c.return_code != 0:
         if reachable_only and c.err == "fatal: malformed object name HEAD\n":
             # this can happen if there are no commits in the repo yet
