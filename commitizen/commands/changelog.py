@@ -136,10 +136,6 @@ class Changelog:
             if changelog_hook:
                 changelog_out = changelog_hook(changelog_out, partial_changelog)
 
-            if self.dry_run:
-                out.write(changelog_out)
-                raise DryRunExit()
-
             changelog_file.write(changelog_out)
 
     def export_template(self):
@@ -223,6 +219,14 @@ class Changelog:
             tree, loader=self.cz.template_loader, template=self.template, **extras
         )
         changelog_out = changelog_out.lstrip("\n")
+
+        # Dry_run is executed here to avoid checking and reading the files
+        if self.dry_run:
+            changelog_hook: Callable | None = self.cz.changelog_hook
+            if changelog_hook:
+                changelog_out = changelog_hook(changelog_out, "")
+            out.write(changelog_out)
+            raise DryRunExit()
 
         lines = []
         if self.incremental and os.path.isfile(self.file_name):
