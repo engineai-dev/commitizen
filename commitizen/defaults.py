@@ -38,6 +38,7 @@ class Settings(TypedDict, total=False):
     tag_format: str
     tag_prefix: str | None
     bump_message: str | None
+    retry_after_failure: bool
     allow_abort: bool
     allowed_prefixes: list[str]
     changelog_file: str
@@ -79,6 +80,7 @@ DEFAULT_SETTINGS: Settings = {
     "tag_format": "$version",  # example v$version
     "tag_prefix": None,
     "bump_message": None,  # bumped v$current_version to $new_version
+    "retry_after_failure": False,
     "allow_abort": False,
     "allowed_prefixes": [
         "Merge",
