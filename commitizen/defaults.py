@@ -78,7 +78,7 @@ DEFAULT_SETTINGS: Settings = {
     "version_provider": "commitizen",
     "version_scheme": None,
     "tag_format": "$version",  # example v$version
-    "tag_prefix": "",
+    "tag_prefix": None,
     "bump_message": None,  # bumped v$current_version to $new_version
     "retry_after_failure": False,
     "allow_abort": False,
