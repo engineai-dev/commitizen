@@ -96,6 +96,7 @@ npm = "commitizen.providers:NpmProvider"
 pep621 = "commitizen.providers:Pep621Provider"
 poetry = "commitizen.providers:PoetryProvider"
 scm = "commitizen.providers:ScmProvider"
+uv = "commitizen.providers:UvProvider"
 
 [tool.poetry.plugins."commitizen.scheme"]
 pep440 = "commitizen.version_schemes:Pep440"

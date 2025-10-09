@@ -226,6 +226,7 @@ class Init:
             "pep621": "pep621: Get and set version from pyproject.toml:project.version field",
             "poetry": "poetry: Get and set version from pyproject.toml:tool.poetry.version field",
             "scm": "scm: Fetch the version from git and does not need to set it back",
+            "uv": "uv: Get and set the version from pyproject.toml:project.version field and uv.lock",
         }
 
         default_val = "commitizen"
