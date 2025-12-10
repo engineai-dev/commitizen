@@ -4,12 +4,10 @@ import re
 import sys
 import warnings
 from itertools import zip_longest
-from typing import (TYPE_CHECKING, ClassVar, Protocol, Type, cast,
-                    runtime_checkable)
+from typing import TYPE_CHECKING, ClassVar, Protocol, Type, cast, runtime_checkable
 
 import importlib_metadata as metadata
-from packaging.version import \
-    InvalidVersion  # noqa: F401: Rexpose the common exception
+from packaging.version import InvalidVersion  # noqa: F401: Rexpose the common exception
 from packaging.version import Version as _BaseVersion
 
 from commitizen.config.base_config import BaseConfig
@@ -264,7 +262,9 @@ class BaseVersion(_BaseVersion):
             pre_version = self.generate_prerelease(prerelease, offset=prerelease_offset)
             post_version = self.generate_postrelease(postrelease)
             build_metadata = self.generate_build_metadata(build_metadata)
-            return self.scheme(f"{base}{pre_version}{post_version}{dev_version}{build_metadata}")  # type: ignore
+            return self.scheme(
+                f"{base}{pre_version}{post_version}{dev_version}{build_metadata}"
+            )  # type: ignore
 
 
 class Pep440(BaseVersion):
@@ -309,6 +309,7 @@ class SemVer(BaseVersion):
             parts.append(f"+{self.local}")
 
         return "".join(parts)
+
 
 class SemVer2(SemVer):
     """
@@ -362,6 +363,56 @@ class SemVer2(SemVer):
             parts.append(f"+{self.local}")
 
         return "".join(parts)
+
+
+class SemVer2Npm(SemVer2):
+    """
+    Semantic Versioning 2.0 (SemVer2) schema with npm-compatible build metadata
+
+    This variant uses a hyphen (-) instead of plus (+) for build metadata
+    to work around npm's behavior of stripping everything after the + sign.
+
+    Example:
+        Standard SemVer2: 1.0.0-dev.1+abc123
+        SemVer2Npm:       1.0.0-dev.1-abc123
+
+    See: https://semver.org/spec/v2.0.0.html
+    """
+
+    def __str__(self) -> str:
+        parts = []
+
+        # Epoch
+        if self.epoch != 0:
+            parts.append(f"{self.epoch}!")
+
+        # Release segment
+        parts.append(".".join(str(x) for x in self.release))
+
+        # Pre-release identifiers
+        # See: https://semver.org/spec/v2.0.0.html#spec-item-9
+        prerelease_parts = []
+        if self.prerelease:
+            prerelease_parts.append(f"{self.prerelease}")
+
+        # Post-release
+        if self.post is not None:
+            prerelease_parts.append(f"post.{self.post}")
+
+        # Development release
+        if self.dev is not None:
+            prerelease_parts.append(f"dev.{self.dev}")
+
+        if prerelease_parts:
+            parts.append("-")
+            parts.append(".".join(prerelease_parts))
+
+        # Local version segment - use hyphen instead of plus for npm compatibility
+        if self.local:
+            parts.append(f"-{self.local}")
+
+        return "".join(parts)
+
 
 DEFAULT_SCHEME: VersionScheme = Pep440
 

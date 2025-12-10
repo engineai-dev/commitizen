@@ -101,6 +101,7 @@ scm = "commitizen.providers:ScmProvider"
 pep440 = "commitizen.version_schemes:Pep440"
 semver = "commitizen.version_schemes:SemVer"
 semver2 = "commitizen.version_schemes:SemVer2"
+semver2npm = "commitizen.version_schemes:SemVer2Npm"
 
 [tool.coverage]
     [tool.coverage.report]
