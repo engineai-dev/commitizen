@@ -207,11 +207,12 @@ def get_commits(
     end: str | None = None,
     *,
     args: str = "",
+    pathspec: str | None = None,
 ) -> list[GitCommit]:
     """Get the commits between start and end."""
     if end is None:
         end = "HEAD"
-    git_log_entries = _get_log_as_str_list(start, end, args)
+    git_log_entries = _get_log_as_str_list(start, end, args, pathspec)
     return [
         GitCommit.from_rev_and_commit(rev_and_commit)
         for rev_and_commit in git_log_entries
@@ -321,12 +322,19 @@ def smart_open(*args, **kwargs):  # type: ignore[no-untyped-def,unused-ignore] #
     return open(*args, newline=EOLType.for_open(), **kwargs)
 
 
-def _get_log_as_str_list(start: str | None, end: str, args: str) -> list[str]:
+def _get_log_as_str_list(
+    start: str | None,
+    end: str,
+    args: str,
+    pathspec: str | None = None,
+) -> list[str]:
     """Get string representation of each log entry"""
     delimiter = "----------commit-delimiter----------"
     log_format: str = "%H%n%P%n%s%n%an%n%ae%n%b"
     command_range = f"{start}..{end}" if start else end
     command = f"git -c log.showSignature=False log --pretty={log_format}{delimiter} {args} {command_range}"
+    if pathspec:
+        command += f" -- {pathspec}"
 
     c = cmd.run(command)
     if c.return_code != 0:
